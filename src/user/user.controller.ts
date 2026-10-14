@@ -1,19 +1,29 @@
-import { Controller, Post, Body, Get } from '@nestjs/common';
-import type { CreateUserDto } from './dtos/createUser.dto.js';
+import { 
+  Controller, 
+  Post, 
+  Body, 
+  Get, 
+  UsePipes,
+  ValidationPipe} from '@nestjs/common';
+import { CreateUserDto } from './dtos/createUser.dto.js';
 import { UserService } from './user.service.js';
-import type { User } from './interfaces/user.entity.js';
+import { ReturnUserDto } from './dtos/returnUser.dto.js';
 
 @Controller('user')
 export class UserController {
 
     constructor(private readonly userService: UserService) {}
+
+    @UsePipes(ValidationPipe)
   @Post()
-  async createUser(@Body() createUser: CreateUserDto):Promise<User> {
-    return this.userService.createUser(createUser);
+    async createUser(@Body() createUser: CreateUserDto): Promise<ReturnUserDto> {
+      return new ReturnUserDto(await this.userService.createUser(createUser));
   }
 
   @Get()
-  async getAllUsers(): Promise<User[]> {
-    return this.userService.getAllUsers();
+    async getAllUsers(): Promise<ReturnUserDto[]> {
+    return (await this.userService.getAllUsers()).map(
+        (userEntity) => new ReturnUserDto(userEntity),
+    );
   }
 }

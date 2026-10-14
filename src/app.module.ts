@@ -3,6 +3,10 @@ import { createObserveModule } from '@nestjs/observe';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from './user/user.module.js';
+import { StateModule } from './state/state.module.js';
+import { CityModule } from './city/city.module.js';
+import { AddressModule } from './address/address.module.js';
+import { CacheModule } from './cache/cache.module.js';
 
 export const { ObserveModule, ObserveInstrument } = createObserveModule();
 
@@ -23,6 +27,10 @@ export const { ObserveModule, ObserveInstrument } = createObserveModule();
       migrationsRun: true,
     }),
     UserModule,
+    StateModule,
+    CityModule,
+    AddressModule,
+    CacheModule,
   ],
 })
 export class AppModule {}
