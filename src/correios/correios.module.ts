@@ -17,7 +17,7 @@ import { Client, createClientAsync } from 'soap';
     CorreiosService,
     {
       provide: 'SOAP_CORREIOS',
-      useFactory: (): Promise<Client> =>
+      useFactory: () => () =>
         createClientAsync(
           'http://ws.correios.com.br/calculador/CalcPrecoPrazo.asmx?wsdl',
         ),

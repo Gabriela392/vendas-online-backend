@@ -19,8 +19,11 @@ import { SizeProductDTO } from './dto/size-product.dto';
 export class CorreiosService {
   URL_CORREIOS = process.env.URL_CEP_CORREIOS;
   CEP_COMPANY = process.env.CEP_COMPANY;
+  private soapClientPromise: Promise<Client> | undefined;
+
   constructor(
-    @Inject('SOAP_CORREIOS') private readonly soapClient: Client,
+    @Inject('SOAP_CORREIOS')
+    private readonly createSoapClient: () => Promise<Client>,
     private readonly httpService: HttpService,
     private readonly cityService: CityService,
   ) {}
@@ -52,7 +55,8 @@ export class CorreiosService {
     cep: string,
     sizeProduct: SizeProductDTO,
   ): Promise<ResponsePriceCorreios> {
-    const [response] = await this.soapClient.CalcPrecoPrazoAsync({
+    const soapClient = await this.getSoapClient();
+    const [response] = await soapClient.CalcPrecoPrazoAsync({
       nCdServico: cdService,
       sCepOrigem: this.CEP_COMPANY,
       sCepDestino: cep,
@@ -75,5 +79,18 @@ export class CorreiosService {
     }
 
     return response;
+  }
+
+  private getSoapClient(): Promise<Client> {
+    if (!this.soapClientPromise) {
+      this.soapClientPromise = this.createSoapClient().catch(
+        (error: unknown) => {
+          this.soapClientPromise = undefined;
+          throw error;
+        },
+      );
+    }
+
+    return this.soapClientPromise;
   }
 }

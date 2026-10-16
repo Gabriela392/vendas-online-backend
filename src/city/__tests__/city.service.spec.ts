@@ -1,4 +1,4 @@
-import { expect, it, jest } from '@jest/globals';
+import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { CacheService } from '../../cache/cache.service';
@@ -6,7 +6,6 @@ import { Repository } from 'typeorm';
 import { CityService } from '../city.service';
 import { CityEntity } from '../entities/city.entity';
 import { cityMock } from '../__mocks__/city.mock';
-import { beforeEach, describe } from 'node:test';
 
 describe('CityService', () => {
   let service: CityService;
