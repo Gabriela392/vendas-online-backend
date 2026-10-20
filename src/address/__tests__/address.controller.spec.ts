@@ -5,6 +5,7 @@ import { AddressController } from '../address.controller';
 import { AddressService } from '../address.service';
 import { addressMock } from '../__mocks__/address.mock';
 import { createAddressMock } from '../__mocks__/create-address.mock';
+import { AddressEntity } from '../entities/address.entity';
 
 describe('AddressController', () => {
   let controller: AddressController;
@@ -16,8 +17,12 @@ describe('AddressController', () => {
         {
           provide: AddressService,
           useValue: {
-            createAddress: jest.fn().mockResolvedValue(addressMock),
-            findAddressByUserId: jest.fn().mockResolvedValue([addressMock]),
+            createAddress: jest
+              .fn<() => Promise<AddressEntity>>()
+              .mockResolvedValue(addressMock),
+            findAddressByUserId: jest
+              .fn<() => Promise<AddressEntity>>()
+              .mockResolvedValue(addressMock),
           },
         },
       ],

@@ -1,8 +1,8 @@
-import { jest } from '@jest/globals';
+import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { CartProductService } from '../../cart-product/cart-product.service';
-import { Repository } from 'typeorm';
+import { DeleteResult, Repository } from 'typeorm';
 import { CartService } from '../cart.service';
 import { CartEntity } from '../entities/cart.entity';
 import { returnDeleteMock } from '../../__mocks__/return-delete.mock';
@@ -25,16 +25,26 @@ describe('CartService', () => {
         {
           provide: CartProductService,
           useValue: {
-            insertProductInCart: jest.fn().mockResolvedValue(undefined),
-            deleteProductCart: jest.fn().mockResolvedValue(returnDeleteMock),
-            updateProductInCart: jest.fn().mockResolvedValue(undefined),
+            insertProductInCart: jest
+              .fn<() => Promise<void>>()
+              .mockResolvedValue(undefined),
+            deleteProductCart: jest
+              .fn<() => Promise<DeleteResult>>()
+              .mockResolvedValue(returnDeleteMock),
+            updateProductInCart: jest
+              .fn<() => Promise<void>>()
+              .mockResolvedValue(undefined),
           },
         },
         {
           provide: getRepositoryToken(CartEntity),
           useValue: {
-            save: jest.fn().mockResolvedValue(cartMock),
-            findOne: jest.fn().mockResolvedValue(cartMock),
+            save: jest
+              .fn<() => Promise<CartEntity>>()
+              .mockResolvedValue(cartMock),
+            findOne: jest
+              .fn<() => Promise<CartEntity>>()
+              .mockResolvedValue(cartMock),
           },
         },
       ],
@@ -66,7 +76,7 @@ describe('CartService', () => {
   });
 
   it('should return error in findOne undefined', async () => {
-    jest.spyOn(cartRepository, 'findOne').mockResolvedValue(undefined);
+    jest.spyOn(cartRepository, 'findOne').mockResolvedValue(null);
 
     await expect(service.clearCart(userEntityMock.id)).rejects.toThrow(
       NotFoundException,
@@ -94,7 +104,7 @@ describe('CartService', () => {
   });
 
   it('should return notFoundException in not found cart', async () => {
-    jest.spyOn(cartRepository, 'findOne').mockResolvedValue(undefined);
+    jest.spyOn(cartRepository, 'findOne').mockResolvedValue(null);
 
     await expect(service.findCartByUserId(userEntityMock.id)).rejects.toThrow(
       NotFoundException,
@@ -160,7 +170,7 @@ describe('CartService', () => {
   });
 
   it('should return NotFoundException in cart not exist', async () => {
-    jest.spyOn(cartRepository, 'findOne').mockResolvedValue(undefined);
+    jest.spyOn(cartRepository, 'findOne').mockResolvedValue(null);
     const spy = jest.spyOn(cartProductService, 'deleteProductCart');
 
     await expect(
@@ -181,7 +191,7 @@ describe('CartService', () => {
   });
 
   it('should return NotFoundException in cart not exist', async () => {
-    jest.spyOn(cartRepository, 'findOne').mockResolvedValue(undefined);
+    jest.spyOn(cartRepository, 'findOne').mockResolvedValue(null);
     const spy = jest.spyOn(cartProductService, 'deleteProductCart');
 
     await expect(
@@ -207,7 +217,7 @@ describe('CartService', () => {
   });
 
   it('should return cart in createCart', async () => {
-    jest.spyOn(cartRepository, 'findOne').mockResolvedValue(undefined);
+    jest.spyOn(cartRepository, 'findOne').mockResolvedValue(null);
 
     const spySave = jest.spyOn(cartRepository, 'save');
     const cart = await service.updateProductInCart(

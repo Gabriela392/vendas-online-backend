@@ -1,4 +1,4 @@
-import { jest } from '@jest/globals';
+import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { Test, TestingModule } from '@nestjs/testing';
 import { returnDeleteMock } from '../../__mocks__/return-delete.mock';
 import { userEntityMock } from '../../user/__mocks__/user.mock';
@@ -7,6 +7,8 @@ import { CartService } from '../cart.service';
 import { cartMock } from '../__mocks__/cart.mock';
 import { insertCartMock } from '../__mocks__/insert-cart.mock';
 import { updateCartMock } from '../__mocks__/update-cart.mock';
+import { CartEntity } from '../entities/cart.entity';
+import { DeleteResult } from 'typeorm';
 
 describe('CartController', () => {
   let controller: CartController;
@@ -18,10 +20,18 @@ describe('CartController', () => {
         {
           provide: CartService,
           useValue: {
-            insertProductInCart: jest.fn().mockResolvedValue(cartMock),
-            findCartByUserId: jest.fn().mockResolvedValue(cartMock),
-            clearCart: jest.fn().mockResolvedValue(returnDeleteMock),
-            updateProductInCart: jest.fn().mockResolvedValue(cartMock),
+            insertProductInCart: jest
+              .fn<() => Promise<CartEntity>>()
+              .mockResolvedValue(cartMock),
+            findCartByUserId: jest
+              .fn<() => Promise<CartEntity>>()
+              .mockResolvedValue(cartMock),
+            clearCart: jest
+              .fn<() => Promise<DeleteResult>>()
+              .mockResolvedValue(returnDeleteMock),
+            updateProductInCart: jest
+              .fn<() => Promise<CartEntity>>()
+              .mockResolvedValue(cartMock),
           },
         },
       ],
