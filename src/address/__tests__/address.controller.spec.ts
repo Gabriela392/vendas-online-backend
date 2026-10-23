@@ -21,8 +21,8 @@ describe('AddressController', () => {
               .fn<() => Promise<AddressEntity>>()
               .mockResolvedValue(addressMock),
             findAddressByUserId: jest
-              .fn<() => Promise<AddressEntity>>()
-              .mockResolvedValue(addressMock),
+              .fn<() => Promise<AddressEntity[]>>()
+              .mockResolvedValue([addressMock]),
           },
         },
       ],

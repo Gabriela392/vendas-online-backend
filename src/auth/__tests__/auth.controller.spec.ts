@@ -1,9 +1,10 @@
-import { jest } from '@jest/globals';
+import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthController } from '../auth.controller';
 import { AuthService } from '../auth.service';
 import { loginUserMock } from '../__mocks__/login-user.mock';
 import { returnLoginMock } from '../__mocks__/return-login.mock';
+import { ReturnLogin } from '../dtos/returnLogin.dto';
 
 describe('AuthController', () => {
   let controller: AuthController;
@@ -15,7 +16,9 @@ describe('AuthController', () => {
         {
           provide: AuthService,
           useValue: {
-            login: jest.fn().mockResolvedValue(returnLoginMock),
+            login: jest
+              .fn<() => Promise<ReturnLogin>>()
+              .mockResolvedValue(returnLoginMock),
           },
         },
       ],

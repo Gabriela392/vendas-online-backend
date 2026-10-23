@@ -1,8 +1,10 @@
-import { jest } from '@jest/globals';
+import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { Test, TestingModule } from '@nestjs/testing';
+import { DeleteResult } from 'typeorm';
 import { returnDeleteMock } from '../../__mocks__/return-delete.mock';
 import { CategoryController } from '../category.controller';
 import { CategoryService } from '../category.service';
+import { CategoryEntity } from '../entities/category.entity';
 import { categoryMock } from '../__mocks__/category.mock';
 import { createCategoryMock } from '../__mocks__/create-category.mock';
 import { updateCategoryMock } from '../__mocks__/update-category.mock';
@@ -17,11 +19,21 @@ describe('CategoryController', () => {
         {
           provide: CategoryService,
           useValue: {
-            findAllCategories: jest.fn().mockResolvedValue([categoryMock]),
-            createCategory: jest.fn().mockResolvedValue(categoryMock),
-            deleteCategory: jest.fn().mockResolvedValue(returnDeleteMock),
-            editCategory: jest.fn().mockResolvedValue(categoryMock),
-            findCategoryById: jest.fn().mockResolvedValue(categoryMock),
+            findAllCategories: jest
+              .fn<() => Promise<CategoryEntity[]>>()
+              .mockResolvedValue([categoryMock]),
+            createCategory: jest
+              .fn<() => Promise<CategoryEntity>>()
+              .mockResolvedValue(categoryMock),
+            deleteCategory: jest
+              .fn<() => Promise<DeleteResult>>()
+              .mockResolvedValue(returnDeleteMock),
+            editCategory: jest
+              .fn<() => Promise<CategoryEntity>>()
+              .mockResolvedValue(categoryMock),
+            findCategoryById: jest
+              .fn<() => Promise<CategoryEntity>>()
+              .mockResolvedValue(categoryMock),
           },
         },
       ],

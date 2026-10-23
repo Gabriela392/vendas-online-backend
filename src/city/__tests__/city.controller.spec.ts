@@ -1,9 +1,10 @@
-import { jest } from '@jest/globals';
+import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { Test, TestingModule } from '@nestjs/testing';
 import { stateMock } from '../../state/__mocks__/state.mock';
 import { CityController } from '../city.controller';
 import { CityService } from '../city.service';
 import { cityMock } from '../__mocks__/city.mock';
+import { CityEntity } from '../entities/city.entity';
 
 describe('CityController', () => {
   let controller: CityController;
@@ -15,7 +16,9 @@ describe('CityController', () => {
         {
           provide: CityService,
           useValue: {
-            getAllCitiesByStateId: jest.fn().mockResolvedValue([cityMock]),
+            getAllCitiesByStateId: jest
+              .fn<() => Promise<CityEntity[]>>()
+              .mockResolvedValue([cityMock]),
           },
         },
       ],

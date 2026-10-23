@@ -18,13 +18,17 @@ describe('CityService', () => {
         {
           provide: CacheService,
           useValue: {
-            getCache: jest.fn().mockResolvedValue([cityMock]),
+            getCache: jest
+              .fn<() => Promise<CityEntity[]>>()
+              .mockResolvedValue([cityMock]),
           },
         },
         {
           provide: getRepositoryToken(CityEntity),
           useValue: {
-            findOne: jest.fn().mockResolvedValue(cityMock),
+            findOne: jest
+              .fn<() => Promise<CityEntity>>()
+              .mockResolvedValue(cityMock),
           },
         },
       ],
@@ -48,7 +52,7 @@ describe('CityService', () => {
   });
 
   it('should return error findOne not found', async () => {
-    jest.spyOn(cityRepository, 'findOne').mockResolvedValue(undefined);
+    jest.spyOn(cityRepository, 'findOne').mockResolvedValue(null);
 
     await expect(service.findCityById(cityMock.id)).rejects.toThrow();
   });

@@ -1,4 +1,4 @@
-import { jest } from '@jest/globals';
+import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ProductController } from '../product.controller';
 import { ProductService } from '../product.service';
@@ -6,6 +6,8 @@ import { productMock, productPaginationMock } from '../__mocks__/product.mock';
 import { createProductMock } from '../__mocks__/create-product.mock';
 import { returnDeleteMock } from '../../__mocks__/return-delete.mock';
 import { updateProductMock } from '../__mocks__/update-product.mock';
+import { ProductEntity } from '../entities/product.entity';
+import { DeleteResult } from 'typeorm';
 
 describe('ProductController', () => {
   let controller: ProductController;
@@ -17,12 +19,25 @@ describe('ProductController', () => {
         {
           provide: ProductService,
           useValue: {
-            findAll: jest.fn().mockResolvedValue([productMock]),
-            createProduct: jest.fn().mockResolvedValue(productMock),
-            findProductById: jest.fn().mockResolvedValue(productMock),
-            updateProduct: jest.fn().mockResolvedValue(productMock),
-            deleteProduct: jest.fn().mockResolvedValue(returnDeleteMock),
-            findAllPage: jest.fn().mockResolvedValue(productPaginationMock),
+            findAll: jest
+              .fn<() => Promise<ProductEntity[]>>()
+              .mockResolvedValue([productMock]),
+            createProduct: jest
+              .fn<() => Promise<ProductEntity>>()
+              .mockResolvedValue(productMock),
+            findProductById: jest
+              .fn<() => Promise<ProductEntity>>()
+              .mockResolvedValue(productMock),
+            updateProduct: jest
+              .fn<() => Promise<ProductEntity>>()
+              .mockResolvedValue(productMock),
+            deleteProduct: jest
+              .fn<() => Promise<DeleteResult>>()
+              .mockResolvedValue(returnDeleteMock),
+
+            findAllPage: jest
+              .fn<() => Promise<any>>()
+              .mockResolvedValue(productPaginationMock),
           },
         },
       ],

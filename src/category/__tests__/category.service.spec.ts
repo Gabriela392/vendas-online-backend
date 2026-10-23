@@ -1,13 +1,14 @@
-import { jest } from '@jest/globals';
+import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { ProductService } from '../../product/product.service';
-import { Repository } from 'typeorm';
+import { DeleteResult, Repository } from 'typeorm';
 import { CategoryService } from '../category.service';
 import { CategoryEntity } from '../entities/category.entity';
 import { categoryMock } from '../__mocks__/category.mock';
 import { createCategoryMock } from '../__mocks__/create-category.mock';
 import { countProductMock } from '../../product/__mocks__/count-product.mock';
+import { CountProduct } from '../../product/dtos/count-product.dto';
 import { ReturnCategory } from '../dtos/return-category.dto';
 import { returnDeleteMock } from '../../__mocks__/return-delete.mock';
 import { productMock } from '../../product/__mocks__/product.mock';
@@ -27,17 +28,25 @@ describe('CategoryService', () => {
           provide: ProductService,
           useValue: {
             countProdutsByCategoryId: jest
-              .fn()
+              .fn<() => Promise<CountProduct[]>>()
               .mockResolvedValue([countProductMock]),
           },
         },
         {
           provide: getRepositoryToken(CategoryEntity),
           useValue: {
-            findOne: jest.fn().mockResolvedValue(categoryMock),
-            find: jest.fn().mockResolvedValue([categoryMock]),
-            save: jest.fn().mockResolvedValue(categoryMock),
-            delete: jest.fn().mockResolvedValue(returnDeleteMock),
+            findOne: jest
+              .fn<() => Promise<CategoryEntity>>()
+              .mockResolvedValue(categoryMock),
+            find: jest
+              .fn<() => Promise<CategoryEntity[]>>()
+              .mockResolvedValue([categoryMock]),
+            save: jest
+              .fn<() => Promise<CategoryEntity>>()
+              .mockResolvedValue(categoryMock),
+            delete: jest
+              .fn<() => Promise<DeleteResult>>()
+              .mockResolvedValue(returnDeleteMock),
           },
         },
       ],
@@ -81,7 +90,7 @@ describe('CategoryService', () => {
   });
 
   it('should return category after save', async () => {
-    jest.spyOn(categoryRepository, 'findOne').mockResolvedValue(undefined);
+    jest.spyOn(categoryRepository, 'findOne').mockResolvedValue(null);
 
     const category = await service.createCategory(createCategoryMock);
 
@@ -101,7 +110,7 @@ describe('CategoryService', () => {
   });
 
   it('should return error if category find by name empty', async () => {
-    jest.spyOn(categoryRepository, 'findOne').mockResolvedValue(undefined);
+    jest.spyOn(categoryRepository, 'findOne').mockResolvedValue(null);
 
     await expect(
       service.findCategoryByName(categoryMock.name),
@@ -115,7 +124,7 @@ describe('CategoryService', () => {
   });
 
   it('should return error in not found category id', async () => {
-    jest.spyOn(categoryRepository, 'findOne').mockResolvedValue(undefined);
+    jest.spyOn(categoryRepository, 'findOne').mockResolvedValue(null);
 
     await expect(service.findCategoryById(categoryMock.id)).rejects.toThrow();
   });

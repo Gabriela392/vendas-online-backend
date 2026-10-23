@@ -1,9 +1,11 @@
-import { jest } from '@jest/globals';
+import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { Test, TestingModule } from '@nestjs/testing';
 import { userEntityMock } from '../../user/__mocks__/user.mock';
 import { OrderController } from '../order.controller';
 import { OrderService } from '../order.service';
 import { orderMock } from '../__mocks__/order.mock';
+import { OrderEntity } from '../entities/order.entity';
+import { ReturnOrderDTO } from '../dtos/return-order.dto';
 
 describe('OrderController', () => {
   let controller: OrderController;
@@ -15,9 +17,15 @@ describe('OrderController', () => {
         {
           provide: OrderService,
           useValue: {
-            createOrder: jest.fn().mockResolvedValue(orderMock),
-            findOrdersByUserId: jest.fn().mockResolvedValue([orderMock]),
-            findAllOrders: jest.fn().mockResolvedValue([orderMock]),
+            createOrder: jest
+              .fn<() => Promise<OrderEntity>>()
+              .mockResolvedValue(orderMock),
+            findOrdersByUserId: jest
+              .fn<() => Promise<OrderEntity[]>>()
+              .mockResolvedValue([orderMock]),
+            findAllOrders: jest
+              .fn<() => Promise<OrderEntity[]>>()
+              .mockResolvedValue([orderMock]),
           },
         },
       ],
@@ -43,15 +51,7 @@ describe('OrderController', () => {
     const spy = jest.spyOn(orderService, 'findAllOrders');
     const orders = await controller.findAllOrders();
 
-    expect(orders).toEqual([
-      {
-        id: orderMock.id,
-        date: orderMock.date.toString(),
-        userId: orderMock.userId,
-        addressId: orderMock.addressId,
-        paymentId: orderMock.paymentId,
-      },
-    ]);
+    expect(orders).toEqual([new ReturnOrderDTO(orderMock)]);
     expect(spy.mock.calls.length).toEqual(1);
   });
 
@@ -59,13 +59,7 @@ describe('OrderController', () => {
     const spy = jest.spyOn(orderService, 'findOrdersByUserId');
     const orders = await controller.findOrderById(orderMock.id);
 
-    expect(orders).toEqual({
-      id: orderMock.id,
-      date: orderMock.date.toString(),
-      userId: orderMock.userId,
-      addressId: orderMock.addressId,
-      paymentId: orderMock.paymentId,
-    });
+    expect(orders).toEqual(new ReturnOrderDTO(orderMock));
     expect(spy.mock.calls.length).toEqual(1);
   });
 });

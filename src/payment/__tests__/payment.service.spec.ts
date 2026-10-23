@@ -1,4 +1,4 @@
-import { jest } from '@jest/globals';
+import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { cartMock } from '../../cart/__mocks__/cart.mock';
@@ -29,7 +29,9 @@ describe('PaymentService', () => {
         {
           provide: getRepositoryToken(PaymentEntity),
           useValue: {
-            save: jest.fn().mockResolvedValue(paymentMock),
+            save: jest
+              .fn<() => Promise<PaymentEntity>>()
+              .mockResolvedValue(paymentMock),
           },
         },
         PaymentService,

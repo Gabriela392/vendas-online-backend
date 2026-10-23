@@ -1,4 +1,4 @@
-import { jest } from '@jest/globals';
+import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { Test, TestingModule } from '@nestjs/testing';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { CacheService } from '../cache.service';
@@ -32,7 +32,7 @@ describe('CacheService', () => {
   });
 
   it('should return data in cache', async () => {
-    const user = await service.getCache('key', () => null);
+    const user = await service.getCache('key', async () => null);
 
     expect(user).toEqual(userEntityMock);
   });

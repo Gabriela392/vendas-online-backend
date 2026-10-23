@@ -1,8 +1,9 @@
-import { jest } from '@jest/globals';
+import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { Test, TestingModule } from '@nestjs/testing';
 import { StateController } from '../state.controller';
 import { StateService } from '../state.service';
 import { stateMock } from '../__mocks__/state.mock';
+import { StateEntity } from '../entities/state.entity';
 
 describe('StateController', () => {
   let controller: StateController;
@@ -14,7 +15,9 @@ describe('StateController', () => {
         {
           provide: StateService,
           useValue: {
-            getAllState: jest.fn().mockResolvedValue([stateMock]),
+            getAllState: jest
+              .fn<() => Promise<StateEntity[]>>()
+              .mockResolvedValue([stateMock]),
           },
         },
       ],

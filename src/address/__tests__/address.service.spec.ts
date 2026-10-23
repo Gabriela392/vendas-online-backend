@@ -46,8 +46,8 @@ describe('AddressService', () => {
               .fn<() => Promise<AddressEntity>>()
               .mockResolvedValue(addressMock),
             find: jest
-              .fn<() => Promise<AddressEntity>>()
-              .mockResolvedValue(addressMock),
+              .fn<() => Promise<AddressEntity[]>>()
+              .mockResolvedValue([addressMock]),
           },
         },
       ],

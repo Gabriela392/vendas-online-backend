@@ -1,4 +1,4 @@
-import { jest } from '@jest/globals';
+import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { JwtService } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ReturnUserDto } from '../../user/dtos/returnUser.dto';
@@ -7,6 +7,8 @@ import { userEntityMock } from '../../user/__mocks__/user.mock';
 import { AuthService } from '../auth.service';
 import { jwtMock } from '../__mocks__/jwt.mock';
 import { loginUserMock } from '../__mocks__/login-user.mock';
+import { UserEntity } from '../../user/entities/user.entity';
+import { NotFoundException } from '@nestjs/common';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -19,7 +21,9 @@ describe('AuthService', () => {
         {
           provide: UserService,
           useValue: {
-            findUserByEmail: jest.fn().mockResolvedValue(userEntityMock),
+            findUserByEmail: jest
+              .fn<() => Promise<UserEntity>>()
+              .mockResolvedValue(userEntityMock),
           },
         },
         {
@@ -56,7 +60,9 @@ describe('AuthService', () => {
   });
 
   it('should return user if email not exist', async () => {
-    jest.spyOn(userService, 'findUserByEmail').mockResolvedValue(undefined);
+    jest
+      .spyOn(userService, 'findUserByEmail')
+      .mockRejectedValue(new NotFoundException());
 
     await expect(service.login(loginUserMock)).rejects.toThrow();
   });

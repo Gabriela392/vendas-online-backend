@@ -1,9 +1,10 @@
-import { jest } from '@jest/globals';
+import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { CategoryService } from '../../category/category.service';
 import { categoryMock } from '../../category/__mocks__/category.mock';
-import { ILike, In, Repository } from 'typeorm';
+import { CategoryEntity } from '../../category/entities/category.entity';
+import { ILike, In, Repository, DeleteResult } from 'typeorm';
 import { ProductEntity } from '../entities/product.entity';
 import { ProductService } from '../product.service';
 import { createProductMock } from '../__mocks__/create-product.mock';
@@ -24,23 +25,37 @@ describe('ProductService', () => {
         {
           provide: CategoryService,
           useValue: {
-            findCategoryById: jest.fn().mockResolvedValue(categoryMock),
+            findCategoryById: jest
+              .fn<() => Promise<CategoryEntity>>()
+              .mockResolvedValue(categoryMock),
           },
         },
         {
           provide: CorreiosService,
           useValue: {
-            priceDelivery: jest.fn().mockResolvedValue({}),
+            priceDelivery: jest
+              .fn<() => Promise<object>>()
+              .mockResolvedValue({}),
           },
         },
         {
           provide: getRepositoryToken(ProductEntity),
           useValue: {
-            find: jest.fn().mockResolvedValue([productMock]),
-            findOne: jest.fn().mockResolvedValue(productMock),
-            save: jest.fn().mockResolvedValue(productMock),
-            delete: jest.fn().mockResolvedValue(returnDeleteMock),
-            findAndCount: jest.fn().mockResolvedValue([[productMock], 1]),
+            find: jest
+              .fn<() => Promise<ProductEntity[]>>()
+              .mockResolvedValue([productMock]),
+            findOne: jest
+              .fn<() => Promise<ProductEntity | null>>()
+              .mockResolvedValue(productMock),
+            save: jest
+              .fn<() => Promise<ProductEntity>>()
+              .mockResolvedValue(productMock),
+            delete: jest
+              .fn<() => Promise<DeleteResult>>()
+              .mockResolvedValue(returnDeleteMock),
+            findAndCount: jest
+              .fn<() => Promise<[ProductEntity[], number]>>()
+              .mockResolvedValue([[productMock], 1]),
           },
         },
       ],
@@ -148,7 +163,7 @@ describe('ProductService', () => {
   });
 
   it('should return error in product not found', async () => {
-    jest.spyOn(productRepository, 'findOne').mockResolvedValue(undefined);
+    jest.spyOn(productRepository, 'findOne').mockResolvedValue(null);
 
     await expect(service.findProductById(productMock.id)).rejects.toThrow();
   });
@@ -216,7 +231,7 @@ describe('ProductService', () => {
     const spy = jest.spyOn(productRepository, 'findAndCount');
     await service.findAllPage(mockSearch);
 
-    expect(spy.mock.calls[0][0].where).toEqual({
+    expect(spy.mock.calls[0]?.[0]?.where).toEqual({
       name: ILike(`%${mockSearch}%`),
     });
   });

@@ -1,4 +1,4 @@
-import { jest } from '@jest/globals';
+import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -17,7 +17,9 @@ describe('StateService', () => {
         {
           provide: getRepositoryToken(StateEntity),
           useValue: {
-            find: jest.fn().mockResolvedValue([stateMock]),
+            find: jest
+              .fn<() => Promise<StateEntity[]>>()
+              .mockResolvedValue([stateMock]),
           },
         },
       ],

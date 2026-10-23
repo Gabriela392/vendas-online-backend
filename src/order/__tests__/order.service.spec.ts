@@ -1,4 +1,4 @@
-import { jest } from '@jest/globals';
+import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { CartService } from '../../cart/cart.service';
@@ -17,6 +17,10 @@ import { productMock } from '../../product/__mocks__/product.mock';
 import { cartProductMock } from '../../cart-product/__mocks__/cart-product.mock';
 import { createOrderPixMock } from '../__mocks__/create-order.mock';
 import { paymentMock } from '../../payment/__mocks__/payment.mock';
+import { PaymentEntity } from '../../payment/entities/payment.entity';
+import { OrderProductEntity } from '../../order-product/entities/order-product.entity';
+import { ProductEntity } from '../../product/entities/product.entity';
+import { CartEntity } from '../../cart/entities/cart.entity';
 
 jest.useFakeTimers().setSystemTime(new Date('2020-01-01'));
 
@@ -35,37 +39,51 @@ describe('OrderService', () => {
         {
           provide: PaymentService,
           useValue: {
-            createPayment: jest.fn().mockResolvedValue(paymentMock),
+            createPayment: jest
+              .fn<() => Promise<PaymentEntity>>()
+              .mockResolvedValue(paymentMock),
           },
         },
         {
           provide: CartService,
           useValue: {
-            findCartByUserId: jest.fn().mockResolvedValue({
-              ...cartMock,
-              cartProduct: [cartProductMock],
-            }),
+            findCartByUserId: jest
+              .fn<() => Promise<CartEntity>>()
+              .mockResolvedValue({
+                ...cartMock,
+                cartProduct: [cartProductMock],
+              }),
             clearCart: jest.fn(),
           },
         },
         {
           provide: OrderProductService,
           useValue: {
-            createOrderProduct: jest.fn().mockResolvedValue(orderProductMock),
-            findAmountProductsByOrderId: jest.fn().mockResolvedValue([]),
+            createOrderProduct: jest
+              .fn<() => Promise<OrderProductEntity>>()
+              .mockResolvedValue(orderProductMock),
+            findAmountProductsByOrderId: jest
+              .fn<() => Promise<any[]>>()
+              .mockResolvedValue([]),
           },
         },
         {
           provide: ProductService,
           useValue: {
-            findAll: jest.fn().mockResolvedValue([productMock]),
+            findAll: jest
+              .fn<() => Promise<ProductEntity[]>>()
+              .mockResolvedValue([productMock]),
           },
         },
         {
           provide: getRepositoryToken(OrderEntity),
           useValue: {
-            find: jest.fn().mockResolvedValue([orderMock]),
-            save: jest.fn().mockResolvedValue(orderMock),
+            find: jest
+              .fn<() => Promise<OrderEntity[]>>()
+              .mockResolvedValue([orderMock]),
+            save: jest
+              .fn<() => Promise<OrderEntity>>()
+              .mockResolvedValue(orderMock),
           },
         },
       ],

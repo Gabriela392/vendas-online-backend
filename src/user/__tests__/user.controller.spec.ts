@@ -1,4 +1,4 @@
-import { jest } from '@jest/globals';
+import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { Test, TestingModule } from '@nestjs/testing';
 import { userEntityMock } from '../../user/__mocks__/user.mock';
 import { ReturnUserDto } from '../dtos/returnUser.dto';
@@ -7,6 +7,7 @@ import { UserController } from '../user.controller';
 import { UserService } from '../user.service';
 import { createUserMock } from '../__mocks__/createUser.mock';
 import { updatePasswordMock } from '../__mocks__/update-user.mock';
+import { UserEntity } from '../entities/user.entity';
 
 describe('UserController', () => {
   let controller: UserController;
@@ -18,12 +19,18 @@ describe('UserController', () => {
         {
           provide: UserService,
           useValue: {
-            createUser: jest.fn().mockResolvedValue(userEntityMock),
-            updatePasswordUser: jest.fn().mockResolvedValue(userEntityMock),
-            getUserByIdUsingRelations: jest
-              .fn()
+            createUser: jest
+              .fn<() => Promise<UserEntity>>()
               .mockResolvedValue(userEntityMock),
-            getAllUser: jest.fn().mockResolvedValue([userEntityMock]),
+            updatePasswordUser: jest
+              .fn<() => Promise<UserEntity>>()
+              .mockResolvedValue(userEntityMock),
+            getUserByIdUsingRelations: jest
+              .fn<() => Promise<UserEntity>>()
+              .mockResolvedValue(userEntityMock),
+            getAllUser: jest
+              .fn<() => Promise<UserEntity[]>>()
+              .mockResolvedValue([userEntityMock]),
           },
         },
       ],
