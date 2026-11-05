@@ -51,7 +51,7 @@ export class ProductController {
     );
   }
 
-  @Roles(UserType.Admin, UserType.Root)
+  @Roles(UserType.Admin, UserType.Root, UserType.User)
   @UsePipes(ValidationPipe)
   @Post()
   async createProduct(

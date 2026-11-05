@@ -45,6 +45,20 @@ $ npm run start:dev
 $ npm run start:prod
 ```
 
+### Local API testing without login
+
+For local development only, role-protected endpoints can be tested without a
+token by enabling the explicit development bypass:
+
+```bash
+npm run start:dev:no-auth
+```
+
+When enabled, the API binds to `127.0.0.1` and accepts requests without checking
+roles. Do not enable this mode outside local development. Without both
+environment variables set exactly as shown, normal JWT authentication and
+authorization remain active.
+
 ## Test
 
 ```bash
