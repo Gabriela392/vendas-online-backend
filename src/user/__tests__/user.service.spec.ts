@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, jest } from '@jest/globals';
+import { NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -91,6 +92,14 @@ describe('UserService', () => {
     const user = await service.getUserByIdUsingRelations(userEntityMock.id);
 
     expect(user).toEqual(userEntityMock);
+  });
+
+  it('should throw NotFoundException when user does not exist in getUserByIdUsingRelations', async () => {
+    jest.spyOn(userRepository, 'findOne').mockResolvedValue(null);
+
+    await expect(
+      service.getUserByIdUsingRelations(userEntityMock.id),
+    ).rejects.toThrow(NotFoundException);
   });
 
   it('should return error if user exist', async () => {

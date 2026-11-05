@@ -109,10 +109,16 @@ describe('ProductService', () => {
     });
   });
 
-  it('should return error if products empty', async () => {
+  it('should return an empty array if no products exist', async () => {
     jest.spyOn(productRepository, 'find').mockResolvedValue([]);
 
-    await expect(service.findAll()).rejects.toThrow();
+    await expect(service.findAll()).resolves.toEqual([]);
+  });
+
+  it('should return error if requested products do not exist', async () => {
+    jest.spyOn(productRepository, 'find').mockResolvedValue([]);
+
+    await expect(service.findAll([1])).rejects.toThrow();
   });
 
   it('should return error in exception', async () => {

@@ -90,11 +90,11 @@ export class ProductService {
 
     const products = await this.productRepository.find(findOptions);
 
-    if (!products || products.length === 0) {
+    if ((!products || products.length === 0) && productId?.length) {
       throw new NotFoundException('Not found products');
     }
 
-    return products;
+    return products ?? [];
   }
 
   async createProduct(createProduct: CreateProductDTO): Promise<ProductEntity> {
