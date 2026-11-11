@@ -6,3 +6,31 @@ export const categoryMock: CategoryEntity = {
   name: 'categoryMock',
   updatedAt: new Date(),
 };
+
+export const mockCategoryList: CategoryEntity[] = [
+  categoryMock,
+  {
+    id: 1,
+    name: 'Pães',
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  },
+  {
+    id: 2,
+    name: 'Salgados',
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  },
+  {
+    id: 3,
+    name: 'Confeitaria',
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  },
+  {
+    id: 4,
+    name: 'Bebidas',
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  },
+];
