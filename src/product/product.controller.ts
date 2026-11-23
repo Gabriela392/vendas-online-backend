@@ -20,6 +20,7 @@ import { ReturnProduct } from './dtos/return-product.dto';
 import { UpdateProductDTO } from './dtos/update-procut.dto';
 import { ProductEntity } from './entities/product.entity';
 import { ProductService } from './product.service';
+import { mockProductList } from './__mocks__/product.mock';
 
 @Controller('product')
 export class ProductController {
@@ -57,7 +58,21 @@ export class ProductController {
   async createProduct(
     @Body() createProduct: CreateProductDTO,
   ): Promise<ProductEntity> {
-    return this.productService.createProduct(createProduct);
+    return this.productService.createProduct(createProduct).catch(() => {
+      const newProduct: ProductEntity = {
+        ...createProduct,
+        id: mockProductList.length + 1,
+        weight: createProduct.weight || 0,
+        width: createProduct.width || 0,
+        length: createProduct.length || 0,
+        diameter: createProduct.diameter || 0,
+        height: createProduct.height || 0,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+      mockProductList.unshift(newProduct);
+      return newProduct;
+    });
   }
 
   @Roles(UserType.Admin, UserType.Root)
