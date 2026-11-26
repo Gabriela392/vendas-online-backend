@@ -3,7 +3,7 @@ import { CorreiosService } from './correios.service';
 import { CorreiosController } from './correios.controller';
 import { HttpModule } from '@nestjs/axios';
 import { CityModule } from '../city/city.module';
-import { Client, createClientAsync } from 'soap';
+import { createClientAsync } from 'soap';
 
 @Module({
   imports: [

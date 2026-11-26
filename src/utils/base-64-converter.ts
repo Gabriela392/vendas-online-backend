@@ -6,7 +6,11 @@ export const authorizantionToLoginPayload = (
   const token = authorization?.replace(/^Bearer\s+/i, '');
   const authorizationSplited = token?.split('.');
 
-  if (!authorizationSplited || authorizationSplited.length < 3 || !authorizationSplited[1]) {
+  if (
+    !authorizationSplited ||
+    authorizationSplited.length < 3 ||
+    !authorizationSplited[1]
+  ) {
     return undefined;
   }
   return JSON.parse(

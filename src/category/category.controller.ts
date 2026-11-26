@@ -74,7 +74,6 @@ export class CategoryController {
     return this.categoryService.editCategory(categoryId, updateCategory);
   }
 
-
   @Get(':categoryId')
   async findCategoryById(
     @Param('categoryId') categoryId: number,
