@@ -2,6 +2,7 @@ import { CategoryEntity } from '../../category/entities/category.entity';
 import {
   Column,
   CreateDateColumn,
+  DeleteDateColumn,
   Entity,
   JoinColumn,
   ManyToOne,
@@ -9,9 +10,19 @@ import {
   PrimaryGeneratedColumn,
   Relation,
   UpdateDateColumn,
+  ValueTransformer,
 } from 'typeorm';
 import { CartProductEntity } from '../../cart-product/entities/cart-product.entity';
 import { OrderProductEntity } from '../../order-product/entities/order-product.entity';
+
+const decimalTransformer: ValueTransformer = {
+  to: (value?: number): number | undefined => value,
+  from: (value?: string | null): number | null => {
+    if (value === null || value === undefined) return null;
+    const parsed = Number(value);
+    return Number.isNaN(parsed) ? null : parsed;
+  },
+};
 
 @Entity({ name: 'product' })
 export class ProductEntity {
@@ -24,7 +35,14 @@ export class ProductEntity {
   @Column({ name: 'category_id', nullable: false })
   categoryId: number;
 
-  @Column({ name: 'price', type: 'decimal', nullable: false })
+  @Column({
+    name: 'price',
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    nullable: false,
+    transformer: decimalTransformer,
+  })
   price: number;
 
   @Column({ name: 'image', nullable: false })
@@ -50,6 +68,9 @@ export class ProductEntity {
 
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
+
+  @DeleteDateColumn({ name: 'deleted_at' })
+  deletedAt?: Date;
 
   @OneToMany(() => CartProductEntity, (cartProduct) => cartProduct.product)
   cartProduct?: CartProductEntity[];

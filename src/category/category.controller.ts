@@ -17,7 +17,6 @@ import { CreateCategory } from './dtos/create-category.dto';
 import { ReturnCategory } from './dtos/return-category.dto';
 import { UpdateCategory } from './dtos/update-category.dto';
 import { CategoryEntity } from './entities/category.entity';
-import { mockCategoryList } from './__mocks__/category.mock';
 
 @Roles(UserType.Admin, UserType.Root, UserType.User)
 @Controller('category')
@@ -26,16 +25,7 @@ export class CategoryController {
 
   @Get()
   async findAllCategories(): Promise<ReturnCategory[]> {
-    const categories = await this.categoryService
-      .findAllCategories()
-      .catch(() => undefined);
-
-    const categoryList =
-      categories && categories.length > 0
-        ? categories
-        : mockCategoryList.map((c) => new ReturnCategory(c, 0));
-
-    return categoryList;
+    return this.categoryService.findAllCategories();
   }
 
   @Roles(UserType.Admin, UserType.Root, UserType.User)
@@ -44,16 +34,7 @@ export class CategoryController {
   async createCategory(
     @Body() createCategory: CreateCategory,
   ): Promise<CategoryEntity> {
-    return this.categoryService.createCategory(createCategory).catch(() => {
-      const newCategory: CategoryEntity = {
-        id: mockCategoryList.length + 1,
-        name: createCategory.name,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
-      mockCategoryList.push(newCategory);
-      return newCategory;
-    });
+    return this.categoryService.createCategory(createCategory);
   }
 
   @Roles(UserType.Admin, UserType.Root)

@@ -5,7 +5,6 @@ import { ProductService } from '../../product/product.service';
 import { DeleteResult, Repository } from 'typeorm';
 import { CategoryService } from '../category.service';
 import { CategoryEntity } from '../entities/category.entity';
-import { categoryMock } from '../__mocks__/category.mock';
 import { createCategoryMock } from '../__mocks__/create-category.mock';
 import { countProductMock } from '../../product/__mocks__/count-product.mock';
 import { CountProduct } from '../../product/dtos/count-product.dto';
@@ -14,6 +13,13 @@ import { returnDeleteMock } from '../../__mocks__/return-delete.mock';
 import { productMock } from '../../product/__mocks__/product.mock';
 import { BadRequestException } from '@nestjs/common';
 import { updateCategoryMock } from '../__mocks__/update-category.mock';
+
+const categoryFixture: CategoryEntity = {
+  id: 1,
+  name: 'category fixture',
+  createdAt: new Date(),
+  updatedAt: new Date(),
+};
 
 describe('CategoryService', () => {
   let service: CategoryService;
@@ -37,13 +43,13 @@ describe('CategoryService', () => {
           useValue: {
             findOne: jest
               .fn<() => Promise<CategoryEntity>>()
-              .mockResolvedValue(categoryMock),
+              .mockResolvedValue(categoryFixture),
             find: jest
               .fn<() => Promise<CategoryEntity[]>>()
-              .mockResolvedValue([categoryMock]),
+              .mockResolvedValue([categoryFixture]),
             save: jest
               .fn<() => Promise<CategoryEntity>>()
-              .mockResolvedValue(categoryMock),
+              .mockResolvedValue(categoryFixture),
             delete: jest
               .fn<() => Promise<DeleteResult>>()
               .mockResolvedValue(returnDeleteMock),
@@ -69,7 +75,7 @@ describe('CategoryService', () => {
     const categories = await service.findAllCategories();
 
     expect(categories).toEqual([
-      new ReturnCategory(categoryMock, countProductMock.total),
+      new ReturnCategory(categoryFixture, countProductMock.total),
     ]);
   });
 
@@ -94,7 +100,7 @@ describe('CategoryService', () => {
 
     const category = await service.createCategory(createCategoryMock);
 
-    expect(category).toEqual(categoryMock);
+    expect(category).toEqual(categoryFixture);
   });
 
   it('should return error in exception', async () => {
@@ -104,44 +110,46 @@ describe('CategoryService', () => {
   });
 
   it('should return category in find by name', async () => {
-    const category = await service.findCategoryByName(categoryMock.name);
+    const category = await service.findCategoryByName(categoryFixture.name);
 
-    expect(category).toEqual(categoryMock);
+    expect(category).toEqual(categoryFixture);
   });
 
   it('should return error if category find by name empty', async () => {
     jest.spyOn(categoryRepository, 'findOne').mockResolvedValue(null);
 
     await expect(
-      service.findCategoryByName(categoryMock.name),
+      service.findCategoryByName(categoryFixture.name),
     ).rejects.toThrow();
   });
 
   it('should return category in find by id', async () => {
-    const category = await service.findCategoryById(categoryMock.id);
+    const category = await service.findCategoryById(categoryFixture.id);
 
-    expect(category).toEqual(categoryMock);
+    expect(category).toEqual(categoryFixture);
   });
 
   it('should return error in not found category id', async () => {
     jest.spyOn(categoryRepository, 'findOne').mockResolvedValue(null);
 
-    await expect(service.findCategoryById(categoryMock.id)).rejects.toThrow();
+    await expect(
+      service.findCategoryById(categoryFixture.id),
+    ).rejects.toThrow();
   });
 
   it('should return delete result in success', async () => {
-    const deleteResult = await service.deleteCategory(categoryMock.id);
+    const deleteResult = await service.deleteCategory(categoryFixture.id);
 
     expect(deleteResult).toEqual(returnDeleteMock);
   });
 
   it('should send relations in request findOne', async () => {
     const spy = jest.spyOn(categoryRepository, 'findOne');
-    await service.deleteCategory(categoryMock.id);
+    await service.deleteCategory(categoryFixture.id);
 
     expect(spy.mock.calls[0][0]).toEqual({
       where: {
-        id: categoryMock.id,
+        id: categoryFixture.id,
       },
       relations: {
         products: true,
@@ -151,11 +159,11 @@ describe('CategoryService', () => {
 
   it('should return error if category with relations', async () => {
     jest.spyOn(categoryRepository, 'findOne').mockResolvedValue({
-      ...categoryMock,
+      ...categoryFixture,
       products: [productMock],
     });
 
-    await expect(service.deleteCategory(categoryMock.id)).rejects.toThrow(
+    await expect(service.deleteCategory(categoryFixture.id)).rejects.toThrow(
       BadRequestException,
     );
   });
@@ -163,20 +171,20 @@ describe('CategoryService', () => {
   it('should return category in update category', async () => {
     const spy = jest.spyOn(categoryRepository, 'findOne');
     const category = await service.editCategory(
-      categoryMock.id,
+      categoryFixture.id,
       updateCategoryMock,
     );
 
-    expect(category).toEqual(categoryMock);
+    expect(category).toEqual(categoryFixture);
     expect(spy.mock.calls.length > 0).toEqual(true);
   });
 
   it('should send new category to save', async () => {
     const spy = jest.spyOn(categoryRepository, 'save');
-    await service.editCategory(categoryMock.id, updateCategoryMock);
+    await service.editCategory(categoryFixture.id, updateCategoryMock);
 
     expect(spy.mock.calls[0][0]).toEqual({
-      ...categoryMock,
+      ...categoryFixture,
       ...updateCategoryMock,
     });
   });

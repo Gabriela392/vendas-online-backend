@@ -5,9 +5,15 @@ import { returnDeleteMock } from '../../__mocks__/return-delete.mock';
 import { CategoryController } from '../category.controller';
 import { CategoryService } from '../category.service';
 import { CategoryEntity } from '../entities/category.entity';
-import { categoryMock } from '../__mocks__/category.mock';
 import { createCategoryMock } from '../__mocks__/create-category.mock';
 import { updateCategoryMock } from '../__mocks__/update-category.mock';
+
+const categoryFixture: CategoryEntity = {
+  id: 1,
+  name: 'category fixture',
+  createdAt: new Date(),
+  updatedAt: new Date(),
+};
 
 describe('CategoryController', () => {
   let controller: CategoryController;
@@ -21,19 +27,19 @@ describe('CategoryController', () => {
           useValue: {
             findAllCategories: jest
               .fn<() => Promise<CategoryEntity[]>>()
-              .mockResolvedValue([categoryMock]),
+              .mockResolvedValue([categoryFixture]),
             createCategory: jest
               .fn<() => Promise<CategoryEntity>>()
-              .mockResolvedValue(categoryMock),
+              .mockResolvedValue(categoryFixture),
             deleteCategory: jest
               .fn<() => Promise<DeleteResult>>()
               .mockResolvedValue(returnDeleteMock),
             editCategory: jest
               .fn<() => Promise<CategoryEntity>>()
-              .mockResolvedValue(categoryMock),
+              .mockResolvedValue(categoryFixture),
             findCategoryById: jest
               .fn<() => Promise<CategoryEntity>>()
-              .mockResolvedValue(categoryMock),
+              .mockResolvedValue(categoryFixture),
           },
         },
       ],
@@ -52,59 +58,79 @@ describe('CategoryController', () => {
   it('should return category Entity in findAllCategories', async () => {
     const category = await controller.findAllCategories();
 
-    expect(category).toEqual([categoryMock]);
+    expect(category).toEqual([categoryFixture]);
   });
 
   it('should return category Entity in createCategory', async () => {
     const category = await controller.createCategory(createCategoryMock);
 
-    expect(category).toEqual(categoryMock);
+    expect(category).toEqual(categoryFixture);
   });
 
   it('should return DeleteResult in delete category', async () => {
-    const category = await controller.deleteCategory(categoryMock.id);
+    const category = await controller.deleteCategory(categoryFixture.id);
 
     expect(category).toEqual(returnDeleteMock);
   });
 
   it('should send category id to delete category', async () => {
     const spy = jest.spyOn(categoryService, 'deleteCategory');
-    await controller.deleteCategory(categoryMock.id);
+    await controller.deleteCategory(categoryFixture.id);
 
-    expect(spy.mock.calls[0][0]).toEqual(categoryMock.id);
+    expect(spy.mock.calls[0][0]).toEqual(categoryFixture.id);
   });
 
   it('should return category in update category', async () => {
     const category = await controller.editCategory(
-      categoryMock.id,
+      categoryFixture.id,
       updateCategoryMock,
     );
 
-    expect(category).toEqual(categoryMock);
+    expect(category).toEqual(categoryFixture);
   });
 
   it('should send category id and body', async () => {
     const spy = jest.spyOn(categoryService, 'editCategory');
-    await controller.editCategory(categoryMock.id, updateCategoryMock);
+    await controller.editCategory(categoryFixture.id, updateCategoryMock);
 
-    expect(spy.mock.calls[0][0]).toEqual(categoryMock.id);
+    expect(spy.mock.calls[0][0]).toEqual(categoryFixture.id);
     expect(spy.mock.calls[0][1]).toEqual(updateCategoryMock);
   });
 
   it('should return category in find category by id', async () => {
-    const category = await controller.findCategoryById(categoryMock.id);
+    const category = await controller.findCategoryById(categoryFixture.id);
 
     expect(category).toEqual({
-      id: categoryMock.id,
-      name: categoryMock.name,
+      id: categoryFixture.id,
+      name: categoryFixture.name,
     });
   });
 
   it('should send id and true relations to findCategoryById', async () => {
     const spy = jest.spyOn(categoryService, 'findCategoryById');
-    await controller.findCategoryById(categoryMock.id);
+    await controller.findCategoryById(categoryFixture.id);
 
-    expect(spy.mock.calls[0][0]).toEqual(categoryMock.id);
+    expect(spy.mock.calls[0][0]).toEqual(categoryFixture.id);
     expect(spy.mock.calls[0][1]).toEqual(true);
+  });
+
+  it('should propagate errors when listing categories fails', async () => {
+    jest
+      .spyOn(categoryService, 'findAllCategories')
+      .mockRejectedValue(new Error('Database unavailable'));
+
+    await expect(controller.findAllCategories()).rejects.toThrow(
+      'Database unavailable',
+    );
+  });
+
+  it('should propagate errors when creating a category fails', async () => {
+    jest
+      .spyOn(categoryService, 'createCategory')
+      .mockRejectedValue(new Error('Database unavailable'));
+
+    await expect(controller.createCategory(createCategoryMock)).rejects.toThrow(
+      'Database unavailable',
+    );
   });
 });

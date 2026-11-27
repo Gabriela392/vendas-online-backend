@@ -2,7 +2,6 @@ import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { CategoryService } from '../../category/category.service';
-import { categoryMock } from '../../category/__mocks__/category.mock';
 import { CategoryEntity } from '../../category/entities/category.entity';
 import { ILike, In, Repository, DeleteResult } from 'typeorm';
 import { ProductEntity } from '../entities/product.entity';
@@ -11,6 +10,13 @@ import { createProductMock } from '../__mocks__/create-product.mock';
 import { productMock } from '../__mocks__/product.mock';
 import { returnDeleteMock } from '../../__mocks__/return-delete.mock';
 import { CorreiosService } from '../../correios/correios.service';
+
+const categoryFixture: CategoryEntity = {
+  id: 1,
+  name: 'category fixture',
+  createdAt: new Date(),
+  updatedAt: new Date(),
+};
 
 describe('ProductService', () => {
   let service: ProductService;
@@ -27,7 +33,7 @@ describe('ProductService', () => {
           useValue: {
             findCategoryById: jest
               .fn<() => Promise<CategoryEntity>>()
-              .mockResolvedValue(categoryMock),
+              .mockResolvedValue(categoryFixture),
           },
         },
         {
